@@ -123,7 +123,7 @@ func initializeDays(client *http.Client, year string, days []string) {
 		outFile.Close()
 
 		// Copy the template.go into the new directory
-		copyFile(goName, "template.go")
+		copyFile(goName, "templates/template.go")
 	}
 }
 
