@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
@@ -98,19 +99,32 @@ func submit(client *http.Client, answer string) {
 	}
 }
 
-func advent(data []byte) string {
-	return ""
+func advent(scanner *bufio.Scanner) (output string) {
+	// Scan the input text
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			log.Fatalln(err)
+		}
+		// Use the text in the output
+		line := scanner.Text()
+		output += line + "\n"
+	}
+
+	return output
 }
 
 func main() {
 	// Read in the input for the day
-	data, err := ioutil.ReadFile("input.txt")
+	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	reader := bufio.NewReader(file)
+	scanner := bufio.NewScanner(reader)
+
 	// Get the output to submit to the server
-	output := advent(data)
+	output := advent(scanner)
 	log.Println(output)
 
 	// Send the output to the server
