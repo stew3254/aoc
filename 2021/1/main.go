@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -99,7 +100,7 @@ func submit(client *http.Client, answer string) {
 	}
 }
 
-func getInput(scanner *bufio.Scanner) (output []string) {
+func getInput(scanner *bufio.Scanner) (output []int) {
 	// Scan the input text
 	for scanner.Scan() {
 		// Fail on error
@@ -110,19 +111,39 @@ func getInput(scanner *bufio.Scanner) (output []string) {
 
 		// Use the text in the output
 		line := scanner.Text()
-		output = append(output, line)
+		// Convert to number
+		n, err := strconv.Atoi(line)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		output = append(output, n)
 	}
 	return output
 }
 
-func problem1(input []string) (output string) {
-	output = input[0]
-	return output
+func problem1(numbers []int) (larger int) {
+	for i := 1; i < len(numbers); i++ {
+		if numbers[i] > numbers[i-1] {
+			larger += 1
+		}
+	}
+	return larger
 }
 
-func problem2(input []string) (output string) {
-	output = input[0]
-	return output
+func sum(nums ...int) (s int) {
+	for _, n := range nums {
+		s += n
+	}
+	return s
+}
+
+func problem2(numbers []int) (larger int) {
+	sums := make([]int, 0, len(numbers)-2)
+	// Create all of the sums
+	for i := 2; i < len(numbers); i++ {
+		sums = append(sums, sum(numbers[i-2:i+1]...))
+	}
+	return problem1(sums)
 }
 
 func main() {
@@ -136,14 +157,13 @@ func main() {
 	scanner := bufio.NewScanner(reader)
 
 	// Get the output to submit to the server
-	input := getInput(scanner)
-	sol1 := problem1(input)
+	numbers := getInput(scanner)
+	sol1 := problem1(numbers)
 	log.Println("Solution 1:", sol1)
-	sol2 := problem2(input)
+	sol2 := problem2(numbers)
 	log.Println("Solution 2:", sol2)
 
 	// Send the output to the server
 	// client := makeClient()
-	// submit(client, sol1)
-	// submit(client, sol2)
+	// submit(client, strconv.Itoa(output))
 }
