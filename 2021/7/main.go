@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -99,7 +100,7 @@ func submit(client *http.Client, answer string) {
 	}
 }
 
-func getInput(scanner *bufio.Scanner) (output []string) {
+func getInput(scanner *bufio.Scanner) (output []int) {
 	// Scan the input text
 	for scanner.Scan() {
 		// Fail on error
@@ -110,7 +111,13 @@ func getInput(scanner *bufio.Scanner) (output []string) {
 
 		// Use the text in the output
 		line := scanner.Text()
-		output = append(output, line)
+		parts := strings.Split(line, ",")
+
+		// Initialize the crab positions
+		for _, p := range parts {
+			c, _ := strconv.Atoi(p)
+			output = append(output, c)
+		}
 	}
 	return output
 }
@@ -137,32 +144,38 @@ func product(args ...int) (total int) {
 	return total
 }
 
-func max(args ...int) (m int) {
+func max(args ...int) (elem int, idx int) {
+	// If empty return 0
 	if len(args) == 0 {
-		return 0
+		return 0, 0
 	}
+
 	temp := args[0]
-	for _, v := range args[1:] {
+	for i, v := range args[1:] {
 		if v > temp {
 			temp = v
-			m = temp
+			elem = temp
+			idx = i + 1
 		}
 	}
-	return m
+	return elem, idx
 }
 
-func min(args ...int) (m int) {
+func min(args ...int) (elem int, idx int) {
+	// If empty return 0
 	if len(args) == 0 {
-		return 0
+		return 0, 0
 	}
+
 	temp := args[0]
-	for _, v := range args[1:] {
+	for i, v := range args[1:] {
 		if v < temp {
 			temp = v
-			m = temp
+			elem = temp
+			idx = i + 1
 		}
 	}
-	return m
+	return elem, idx
 }
 
 func average(args ...int) float32 {
@@ -183,7 +196,7 @@ func mostCommon(args ...int) (common []int) {
 			common = append(common, k)
 		}
 
-		temp := max(value, v)
+		temp, _ := max(value, v)
 		// If it was bigger, add just that key
 		if temp > value {
 			value = temp
@@ -194,11 +207,28 @@ func mostCommon(args ...int) (common []int) {
 	return common
 }
 
-func problem1(input []string) (output int) {
+func problem1(input []int) (output int) {
+	common := mostCommon(input...)
+	for i, v := range common {
+		// Loop over input
+		total := 0
+		for _, pos := range input {
+			// Add total fuel cost to move to this position
+			total += abs(pos - v)
+		}
+		// For first thing make output the total
+		if i == 0 {
+			output = total
+		} else {
+			// Take the min otherwise
+			output, _ = min(output, total)
+		}
+	}
+
 	return output
 }
 
-func problem2(input []string) (output int) {
+func problem2(input []int) (output int) {
 	return output
 }
 
