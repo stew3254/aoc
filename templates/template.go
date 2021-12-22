@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"sort"
 	"strings"
 )
 
@@ -192,6 +193,23 @@ func mostCommon(args ...int) (common []int) {
 	}
 
 	return common
+}
+
+func median(args ...int) int {
+	sort.Ints(args)
+
+	middle := len(args) / 2
+
+	// Check if odd
+	if len(args)&1 == 1 {
+		return args[middle]
+	}
+
+	return (args[middle-1] + args[middle]) / 2
+}
+
+func sequence(n int) (total int) {
+	return n * (n + 1) / 2
 }
 
 func problem1(input []string) (output int) {

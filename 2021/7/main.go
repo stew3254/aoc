@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -207,29 +208,66 @@ func mostCommon(args ...int) (common []int) {
 	return common
 }
 
-func problem1(input []int) (output int) {
-	common := mostCommon(input...)
-	for i, v := range common {
-		// Loop over input
-		total := 0
-		for _, pos := range input {
-			// Add total fuel cost to move to this position
-			total += abs(pos - v)
-		}
-		// For first thing make output the total
-		if i == 0 {
-			output = total
-		} else {
-			// Take the min otherwise
-			output, _ = min(output, total)
-		}
+func median(args ...int) int {
+	sort.Ints(args)
+
+	middle := len(args) / 2
+
+	// Check if odd
+	if len(args)&1 == 1 {
+		return args[middle]
 	}
 
+	return (args[middle-1] + args[middle]) / 2
+}
+
+func sequence(n int) (total int) {
+	return n * (n + 1) / 2
+}
+
+func problem1(input []int) (output int) {
+	med := median(input...)
+	for _, pos := range input {
+		// Add total fuel cost to move to this position
+		output += abs(pos - med)
+	}
 	return output
 }
 
 func problem2(input []int) (output int) {
-	return output
+	// Get a good starting position near the minimum
+	pos := int(average(input...))
+	// Search directions
+	direction := 1
+
+	// Create the fuel map
+	fuel := make(map[int]int)
+
+	for {
+		for _, v := range input {
+			fuel[pos] += sequence(abs(v - pos))
+		}
+
+		// If this is the first point, just go right
+		if len(fuel) == 1 {
+			pos++
+		} else if fuel[pos] > fuel[pos-direction] {
+			if len(fuel) == 2 {
+				// Stop searching right and go left
+				if direction > 0 {
+					direction = -1
+					pos = pos - 2
+				}
+				// Skip the iteration
+				continue
+			}
+			// We found our position
+			return fuel[pos-direction]
+		} else {
+			// Move over one
+			pos += direction
+		}
+	}
 }
 
 func main() {
